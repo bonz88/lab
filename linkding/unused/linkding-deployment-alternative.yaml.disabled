@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: linkding
+  name: linkding
+  namespace: linkding
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: linkding
+  template:
+    metadata:
+      labels:
+        app: linkding
+    spec:
+      containers:
+      - image: sissbruecker/linkding:1.40.0
+        name: linkding
+        ports:
+        - containerPort: 9090
+        env:
+        - name: LD_SUPERUSER_NAME
+          value: "admin"
+        - name: LD_SUPERUSER_PASSWORD
+          value: "changeme123"
+        - name: LD_DISABLE_BACKGROUND_TASKS
+          value: "False"
+        - name: LD_DISABLE_URL_VALIDATION
+          value: "False"
+        command: ["/bin/sh"]
+        args: 
+        - "-c"
+        - |
+          # Create custom uwsgi config
+          cat > /etc/linkding/uwsgi.ini << EOF
+          [uwsgi]
+          module = siteroot.wsgi:application
+          master = true
+          enable-threads = true
+          processes = 2
+          threads = 2
+          http = 0.0.0.0:9090
+          buffer-size = 32768
+          max-requests = 1000
+          max-requests-delta = 50
+          harakiri = 120
+          ignore-sigpipe = true
+          ignore-write-errors = true
+          disable-write-exception = true
+          static-map = /static=/opt/linkding/static
+          static-map = /static=/opt/linkding/data/favicons
+          static-map = /static=/opt/linkding/data/previews
+          static-map = /robots.txt=/opt/linkding/static/robots.txt
+          statistics = 127.0.0.1:9191
+          EOF
+          
+          # Start linkding with custom config
+          exec python manage.py runserver 0.0.0.0:9090

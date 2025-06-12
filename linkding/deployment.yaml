@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: linkding
+  name: linkding
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: linkding
+  template:
+    metadata:
+      labels:
+        app: linkding
+    spec:
+      containers:
+      - image: sissbruecker/linkding:1.40.0
+        name: linkding
+        ports:
+          - containerPort: 9090
+        env:
+          - name: LD_SUPERUSER_NAME
+            valueFrom:
+              secretKeyRef:
+                name: linkding-credentials
+                key: username
+          - name: LD_SUPERUSER_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: linkding-credentials
+                key: password

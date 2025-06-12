@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: linkding
+  name: linkding
+  namespace: linkding
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: linkding
+  template:
+    metadata:
+      labels:
+        app: linkding
+    spec:
+      containers:
+      - image: sissbruecker/linkding:1.40.0
+        name: linkding
+        ports:
+        - containerPort: 9090
+        env:
+        - name: LD_SUPERUSER_NAME
+          value: "admin"
+        - name: LD_SUPERUSER_PASSWORD
+          value: "changeme123"
+        - name: LD_DISABLE_BACKGROUND_TASKS
+          value: "False"
+        - name: LD_DISABLE_URL_VALIDATION
+          value: "False"
+        - name: LD_SERVER_PORT
+          value: "9090"
+        - name: LD_HOST
+          value: "0.0.0.0"
+        - name: LD_UWSGI_OPTIONS
+          value: "--http-socket=0.0.0.0:9090"
