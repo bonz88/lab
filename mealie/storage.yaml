@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mealie-data      # The name we'll use to refer to this claim.
+  namespace: mealie     # The PVC must be in the same namespace as the Pod that uses it.
+spec:
+  accessModes:
+    - ReadWriteOnce     # This volume can be mounted as read-write by a single node.
+  resources:
+    requests:
+      storage: 500Mi      # We are requesting 500 Mebibytes of storage.
+
